@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kantin Digital</title>
+    
+<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Style untuk Background Image di Halaman Login */
+        .auth-background {
+            /* MENGGUNAKAN LINK GAMBAR YANG ANDA BERIKAN */
+            background-image: url('https://buguruku.com/wp-content/uploads/2023/02/2-1.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Overlay untuk meningkatkan keterbacaan teks */
+        .auth-overlay {
+            background-color: rgba(0, 0, 0, 0.6); /* Overlay hitam transparan */
+        }
+        
+        /* Style untuk transisi kartu menu */
+        .menu-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for better look */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #9ca3af;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+<div id="app-container" class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        
+<header id="app-header" class="bg-white shadow-lg rounded-xl p-4 flex justify-between items-center mb-6 sticky top-0 z-10 hidden">
+            <h1 class="text-3xl font-bold text-indigo-700">KantinKita</h1>
+            <nav>
+                <button id="cart-button" class="relative p-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.23a2 2 0 0 0 2-1.92L23 6H6"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                </button>
+                <button id="logout-button" class="ml-4 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition duration-150">
+                    Keluar
+                </button>
+            </nav>
+        </header>
+
+        
+<main id="main-content">
+            
+</main>
+        
+        
+<div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all duration-300 scale-95 opacity-0">
+                <h3 id="modal-title" class="text-xl font-bold mb-3 text-gray-800"></h3>
+                <p id="modal-body" class="text-gray-600 mb-6"></p>
+                <button id="modal-close-button" class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150">
+                    Tutup
+                </button>
+            </div>
+        </div>
+
+        
+<div id="cart-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center p-4 z-40">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 transform transition-all duration-300 scale-95 opacity-0">
+                <div class="flex justify-between items-center mb-4 border-b pb-3">
+                    <h3 class="text-2xl font-bold text-indigo-700">Keranjang Belanja</h3>
+                    <button class="text-gray-400 hover:text-gray-600" onclick="closeCartModal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                
+                <div id="cart-items" class="max-h-80 overflow-y-auto custom-scrollbar mb-4">
+                    
+</div>
+                
+                
+<div id="recommendation-container" class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-lg hidden">
+                    <p class="text-sm font-semibold text-indigo-800 mb-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 16.5L16.5 12.5L12.5 8.5L8.5 12.5L12.5 16.5Z"/><path d="M18 12L22 12M2 12L6 12M12 2L12 6M12 18L12 22"/></svg>
+                        Rekomendasi Menu Cerdas
+                    </p>
+                    <p id="recommendation-text" class="text-gray-700 text-sm italic"></p>
+                    <div id="recommendation-loading" class="text-center text-sm text-indigo-700 hidden mt-2">Memuat rekomendasi...</div>
+                </div>
+
+                <button id="generate-recommendation-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition duration-150 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Dapatkan Rekomendasi Tambahan ✨
+                </button>
+                
+<div class="flex justify-between items-center border-t pt-4 mt-4">
+                    <p class="text-xl font-bold text-gray-800">Total:</p>
+                    <p id="cart-total" class="text-2xl font-extrabold text-green-600">Rp 0</p>
+                </div>
+
+                <button id="checkout-button" class="mt-6 w-full px-4 py-3 bg-green-500 text-white font-bold rounded-lg shadow-lg hover:bg-green-600 transition duration-150" disabled>
+                    Pesan Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA SIMULASI ---
+        let currentUser = null;
+        let users = [];
+        let cart = [];
+
+        // Data Menu Kantin dengan URL gambar yang lebih menarik dan menggugah selera
+        const menuData = [
+            // Nasi Goreng Spesial - 
+            { id: 1, name: "Nasi Goreng Spesial", price: 20000, category: "Makanan Utama", canteen: "Kantin A", img: "https://th.bing.com/th/id/OSK.ad20e39826790ab31e2d013c670afd22?w=200&h=126&c=7&rs=1&qlt=80&o=6&cdv=1&dpr=1.5&pid=16.1" },
+            // Mie Ayam Bakso - 
+            { id: 2, name: "Mie Ayam Bakso", price: 18000, category: "Makanan Utama", canteen: "Kantin B", img: "https://placehold.co/400x300/067f00/ffffff?text=Mie+Ayam+%F0%9F%8D%9C" },
+            // Es Teh Manis - 
+            { id: 3, name: "Es Teh Manis", price: 5000, category: "Minuman", canteen: "Kantin A", img: "https://placehold.co/400x300/f8d700/1f2937?text=Es+Teh+%F0%9F%A5%A4" },
+            // Kentang Goreng - 
+            { id: 4, name: "Kentang Goreng", price: 12000, category: "Camilan", canteen: "Kantin C", img: "https://placehold.co/400x300/f0b441/1f2937?text=Kentang+Goreng+%F0%9F%8D%9F" },
+            // Ayam Geprek Sambal Matah - 
+            { id: 5, name: "Ayam Geprek Sambal Matah", price: 25000, category: "Makanan Utama", canteen: "Kantin C", img: "https://placehold.co/400x300/e2380e/ffffff?text=Ayam+Geprek+%F0%9F%8C%B6%EF%B8%8F" },
+            // Jus Alpukat - 
+            { id: 6, name: "Jus Alpukat", price: 15000, category: "Minuman", canteen: "Kantin B", img: "https://placehold.co/400x300/2a5c37/ffffff?text=Jus+Alpukat+%F0%9F%8D%83" },
+            // Puding Cokelat - 
+            { id: 7, name: "Puding Cokelat", price: 10000, category: "Hidangan Penutup", canteen: "Kantin A", img: "https://placehold.co/400x300/4e342e/ffffff?text=Puding+Cokelat+%F0%9F%8D%87" },
+            // Lemon Tea Dingin - 
+            { id: 8, name: "Lemon Tea Dingin", price: 7000, category: "Minuman", canteen: "Kantin B", img: "https://placehold.co/400x300/ffe082/1f2937?text=Lemon+Tea+%E2%98%85" },
+        ];
+
+        // --- GEMINI API CONFIGURATION ---
+        const apiKey = ""; // API Key akan disediakan oleh Canvas
+        const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent';
+
+        // --- UTILITIES (API Calls) ---
+        async function fetchWithRetry(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        // Jika bukan percobaan terakhir, coba lagi dengan exponential backoff
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (2 ** i)));
+                            continue;
+                        }
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Fetch attempt ${i + 1} failed:`, error);
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (2 ** i)));
+                }
+            }
+        }
+        
+        // --- UTILITIES (Penyimpanan Lokal) ---
+        function loadUsers() {
+            const storedUsers = localStorage.getItem('kantinUsers');
+            if (storedUsers) {
+                try {
+                    users = JSON.parse(storedUsers);
+                } catch (e) {
+                    console.error("Error parsing users from localStorage:", e);
+                    users = [];
+                }
+            }
+        }
+
+        function saveUsers() {
+            localStorage.setItem('kantinUsers', JSON.stringify(users));
+        }
+
+        function loadCart() {
+            const storedCart = localStorage.getItem('kantinCart');
+            if (storedCart) {
+                try {
+                    cart = JSON.parse(storedCart);
+                } catch (e) {
+                    console.error("Error parsing cart from localStorage:", e);
+                    cart = [];
+                }
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('kantinCart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        // --- FUNGSI TAMPILAN MODAL ---
+        const messageModal = document.getElementById('message-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalCloseButton = document.getElementById('modal-close-button');
+
+        function showMessageModal(title, body, callback = null) {
+            modalTitle.textContent = title;
+            modalBody.textContent = body;
+            
+            // Tampilkan modal dengan transisi
+            messageModal.classList.remove('hidden');
+            messageModal.classList.add('flex');
+            setTimeout(() => {
+                messageModal.querySelector('div').classList.remove('opacity-0', 'scale-95');
+                messageModal.querySelector('div').classList.add('opacity-100', 'scale-100');
+            }, 10);
+
+            modalCloseButton.onclick = () => {
+                // Sembunyikan modal dengan transisi
+                messageModal.querySelector('div').classList.remove('opacity-100', 'scale-100');
+                messageModal.querySelector('div').classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    messageModal.classList.add('hidden');
+                    messageModal.classList.remove('flex');
+                    if (callback) callback();
+                }, 300); // Tunggu transisi selesai
+            };
+        }
+
+        // --- FUNGSI OTENTIKASI ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.email.value.trim();
+            const password = e.target.password.value.trim();
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('kantinCurrentUser', JSON.stringify(user));
+                renderMenuPage();
+            } else {
+                showMessageModal("Gagal Login", "Email atau kata sandi salah. Silakan coba lagi.");
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const email = e.target.email.value.trim();
+            const password = e.target.password.value.trim();
+            const name = e.target.name.value.trim();
+
+            if (users.find(u => u.email === email)) {
+                showMessageModal("Gagal Daftar", "Email sudah terdaftar. Silakan gunakan email lain atau login.");
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessageModal("Gagal Daftar", "Kata sandi harus minimal 6 karakter.");
+                return;
+            }
+
+            const newUser = { id: Date.now(), name, email, password };
+            users.push(newUser);
+            saveUsers();
+            
+            showMessageModal("Berhasil Daftar", "Akun berhasil dibuat! Silakan login.", () => {
+                renderLoginPage();
+            });
+        }
+        
+        // FUNGSI BARU: Masuk sebagai Tamu
+        function handleGuestLogin() {
+            currentUser = { id: crypto.randomUUID(), name: 'Tamu Kantin', email: 'guest@kantin.com' };
+            localStorage.setItem('kantinCurrentUser', JSON.stringify(currentUser));
+            showMessageModal("Selamat Datang!", "Anda masuk sebagai Tamu. Selamat berbelanja!", () => {
+                renderMenuPage();
+            });
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            cart = [];
+            localStorage.removeItem('kantinCurrentUser');
+            localStorage.removeItem('kantinCart');
+            updateCartCount();
+            renderLoginPage();
+        }
+
+        // --- RENDERING HALAMAN ---
+        
+        // Fungsi untuk mengatur tampilan halaman (Auth vs Menu)
+        function setAppLayout(isAuthPage) {
+            const appContainer = document.getElementById('app-container');
+            const body = document.body;
+            
+            if (isAuthPage) {
+                // Terapkan gaya latar belakang dan pusat layar
+                body.classList.add('auth-background', 'auth-overlay');
+                body.classList.remove('bg-gray-50');
+                
+                appContainer.classList.remove('max-w-4xl', 'mx-auto', 'p-4', 'md:p-8');
+                appContainer.classList.add('flex', 'items-center', 'justify-center', 'min-h-screen', 'w-full');
+            } else {
+                // Terapkan gaya menu
+                body.classList.remove('auth-background', 'auth-overlay');
+                body.classList.add('bg-gray-50');
+                
+                appContainer.classList.add('max-w-4xl', 'mx-auto', 'p-4', 'md:p-8');
+                appContainer.classList.remove('flex', 'items-center', 'justify-center', 'min-h-screen', 'w-full');
+            }
+        }
+
+
+        // 1. Halaman Login
+        function renderLoginPage() {
+            setAppLayout(true);
+            document.getElementById('app-header').classList.add('hidden');
+            const content = document.getElementById('main-content');
+            content.innerHTML = `
+                <div class="bg-white p-8 md:p-10 rounded-xl shadow-2xl max-w-md w-full transition duration-500 ease-in-out">
+                    <!-- Tambahkan Logo di sini -->
+                    <div class="flex justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="text-3xl font-extrabold text-center text-indigo-800 mb-6">Selamat Datang di KantinKita</h2>
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Pelanggan</label>
+                            <input type="email" id="login-email" name="email" required placeholder="email@contoh.com"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                            <input type="password" id="login-password" name="password" required placeholder="Minimal 6 karakter"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 mt-6">
+                            Masuk
+                        </button>
+                    </form>
+                    
+                    
+<div class="mt-4 flex items-center">
+                        <hr class="flex-grow border-gray-300">
+                        <span class="px-2 text-sm text-gray-500">ATAU</span>
+                        <hr class="flex-grow border-gray-300">
+                    </div>
+                    
+                    <button id="guest-login-button" class="w-full py-3 mt-4 border border-indigo-600 text-indigo-600 font-bold rounded-lg hover:bg-indigo-50 transition duration-200 shadow-sm">
+                        Masuk sebagai Tamu
+                    </button>
+
+                    <p class="mt-6 text-center text-sm text-gray-600">
+                        Belum punya akun? 
+                        <a href="#" id="to-register-link" class="font-semibold text-indigo-600 hover:text-indigo-800 transition duration-150">Daftar Sekarang</a>
+                    </p>
+                </div>
+            `;
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('to-register-link').addEventListener('click', (e) => { e.preventDefault(); renderRegisterPage(); });
+            document.getElementById('guest-login-button').addEventListener('click', handleGuestLogin);
+        }
+
+        // 2. Halaman Register
+        function renderRegisterPage() {
+            setAppLayout(true);
+            document.getElementById('app-header').classList.add('hidden');
+            const content = document.getElementById('main-content');
+            content.innerHTML = `
+                <div class="bg-white p-8 md:p-10 rounded-xl shadow-2xl max-w-md w-full transition duration-500 ease-in-out">
+                    <!-- Tambahkan Logo di sini -->
+                    <div class="flex justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-center text-indigo-800 mb-6">Daftar Akun Baru</h2>
+                    <form id="register-form" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="register-name" name="name" required placeholder="Nama Anda"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="register-email" name="email" required placeholder="email@contoh.com"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                            <input type="password" id="register-password" name="password" required placeholder="Minimal 6 karakter"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition duration-200 mt-6">
+                            Daftar
+                        </button>
+                    </form>
+                    <p class="mt-6 text-center text-sm text-gray-600">
+                        Sudah punya akun? 
+                        <a href="#" id="to-login-link" class="font-semibold text-indigo-600 hover:text-indigo-800 transition duration-150">Masuk</a>
+                    </p>
+                </div>
+            `;
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
+            document.getElementById('to-login-link').addEventListener('click', (e) => { e.preventDefault(); renderLoginPage(); });
+        }
+
+        // 3. Halaman Menu Utama
+        function renderMenuPage() {
+            if (!currentUser) {
+                renderLoginPage();
+                return;
+            }
+
+            setAppLayout(false); // Atur layout ke mode Menu
+            document.getElementById('app-header').classList.remove('hidden');
+            const content = document.getElementById('main-content');
+
+            // Konten Sapaan dan Pencarian
+            let html = `
+                <div class="bg-indigo-600 text-white p-6 rounded-xl shadow-lg mb-6">
+                    <p class="text-lg">Selamat datang, <span class="font-bold">${currentUser.name}</span>!</p>
+                    <h2 class="text-3xl font-extrabold mt-1">Mau pesan apa hari ini?</h2>
+                </div>
+                
+                <div class="mb-6 p-4 bg-white rounded-xl shadow-md flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-400 mr-3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" placeholder="Cari makanan, minuman, atau kantin..." 
+                        class="w-full bg-transparent text-lg focus:outline-none placeholder-gray-400">
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-700 mb-4">Daftar Menu Lengkap</h3>
+                <div id="menu-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+</div>
+            `;
+            content.innerHTML = html;
+
+            document.getElementById('search-input').addEventListener('input', (e) => renderMenuItems(e.target.value));
+            
+            // Render menu awal
+            renderMenuItems();
+        }
+
+        function renderMenuItems(searchTerm = '') {
+            const menuList = document.getElementById('menu-list');
+            menuList.innerHTML = '';
+            
+            const filteredMenu = menuData.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.canteen.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.category.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filteredMenu.length === 0) {
+                menuList.innerHTML = `<p class="col-span-3 text-center text-gray-500 py-12 text-lg">Tidak ada menu yang ditemukan untuk "${searchTerm}".</p>`;
+                return;
+            }
+
+            filteredMenu.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'menu-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300 border border-gray-100 hover:border-indigo-300';
+                card.innerHTML = `
+                    <img src="${item.img}" onerror="this.onerror=null;this.src='https://placehold.co/400x300/4f46e5/ffffff?text=Kantin'" 
+                         alt="Gambar ${item.name}" class="w-full h-32 object-cover">
+                    <div class="p-4">
+                        <span class="text-xs font-medium text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">${item.category}</span>
+                        <h4 class="text-xl font-semibold text-gray-900 mt-1 mb-1">${item.name}</h4>
+                        <p class="text-sm text-gray-500 mb-2">Kantin: ${item.canteen}</p>
+                        <p class="text-2xl font-bold text-green-600 mb-3">Rp ${item.price.toLocaleString('id-ID')}</p>
+                        <button onclick="addToCart(${item.id})"
+                                class="w-full flex items-center justify-center py-2 bg-indigo-500 text-white font-medium rounded-lg hover:bg-indigo-600 transition duration-150 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Tambah
+                        </button>
+                    </div>
+                `;
+                menuList.appendChild(card);
+            });
+        }
+
+        // --- FUNGSI KERANJANG ---
+        
+        function addToCart(menuId) {
+            const item = menuData.find(m => m.id === menuId);
+            if (!item) return;
+
+            const existingItem = cart.find(c => c.id === menuId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            saveCart();
+            showMessageModal("Berhasil!", `${item.name} telah ditambahkan ke keranjang.`);
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function calculateCartTotal() {
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        // Render isi keranjang di modal
+        function renderCartItems() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalElement = document.getElementById('cart-total');
+            const checkoutButton = document.getElementById('checkout-button');
+            const recContainer = document.getElementById('recommendation-container');
+            const recText = document.getElementById('recommendation-text');
+            const recLoading = document.getElementById('recommendation-loading');
+            const recButton = document.getElementById('generate-recommendation-button');
+            
+            // Sembunyikan rekomendasi dan reset teks saat modal dibuka/di-render ulang
+            recText.textContent = '';
+            recContainer.classList.add('hidden');
+            recButton.disabled = false;
+
+
+            cartItemsContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="text-center py-10 text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-3 text-indigo-400"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.23a2 2 0 0 0 2-1.92L23 6H6"></path></svg>
+                        <p class="text-lg font-semibold">Keranjang Anda kosong.</p>
+                        <p class="text-sm">Mari tambahkan beberapa menu lezat!</p>
+                    </div>
+                `;
+                cartTotalElement.textContent = 'Rp 0';
+                checkoutButton.disabled = true;
+                recButton.disabled = true;
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex items-center justify-between border-b last:border-b-0 py-3';
+                itemElement.innerHTML = `
+                    <div class="flex-grow">
+                        <h4 class="font-semibold text-gray-800">${item.name}</h4>
+                        <p class="text-sm text-gray-500">${item.canteen} &bull; Rp ${item.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeQuantity(${item.id}, -1)" class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 text-gray-700 transition duration-150">-</button>
+                        <span class="font-bold text-gray-800 w-6 text-center">${item.quantity}</span>
+                        <button onclick="changeQuantity(${item.id}, 1)" class="w-8 h-8 flex items-center justify-center bg-indigo-500 rounded-full hover:bg-indigo-600 text-white transition duration-150">+</button>
+                    </div>
+                    <div class="ml-4 w-20 text-right">
+                        <p class="font-bold text-indigo-600">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</p>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(itemElement);
+            });
+            
+            cartTotalElement.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            checkoutButton.disabled = false;
+        }
+
+        function changeQuantity(menuId, delta) {
+            const itemIndex = cart.findIndex(c => c.id === menuId);
+
+            if (itemIndex > -1) {
+                cart[itemIndex].quantity += delta;
+
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1); // Hapus jika kuantitas <= 0
+                }
+                saveCart();
+                renderCartItems(); // Perbarui tampilan keranjang
+            }
+        }
+
+        function showCartModal() {
+            renderCartItems();
+            const cartModal = document.getElementById('cart-modal');
+            cartModal.classList.remove('hidden');
+            cartModal.classList.add('flex');
+            setTimeout(() => {
+                cartModal.querySelector('div').classList.remove('opacity-0', 'scale-95');
+                cartModal.querySelector('div').classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function closeCartModal() {
+            const cartModal = document.getElementById('cart-modal');
+            cartModal.querySelector('div').classList.remove('opacity-100', 'scale-100');
+            cartModal.querySelector('div').classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                cartModal.classList.add('hidden');
+                cartModal.classList.remove('flex');
+            }, 300);
+        }
+        
+        function handleCheckout() {
+            if (cart.length === 0) return;
+
+            const total = calculateCartTotal();
+            const orderDetails = cart.map(item => `${item.name} (${item.quantity}x) - Kantin ${item.canteen}`).join(', ');
+
+            showMessageModal(
+                "Pesanan Diterima!",
+                `Total pembayaran: Rp ${total.toLocaleString('id-ID')}. Pesanan: ${orderDetails}. Harap tunggu pesanan Anda disiapkan.`,
+                () => {
+                    // Reset keranjang setelah checkout
+                    cart = [];
+                    saveCart();
+                    closeCartModal();
+                }
+            );
+        }
+
+        // --- FUNGSI GEMINI: REKOMENDASI MENU ---
+        async function generateRecommendation() {
+            if (cart.length === 0) {
+                showMessageModal("Oops!", "Keranjang belanja Anda masih kosong. Isi dulu untuk mendapatkan rekomendasi!");
+                return;
+            }
+
+            const recContainer = document.getElementById('recommendation-container');
+            const recText = document.getElementById('recommendation-text');
+            const recLoading = document.getElementById('recommendation-loading');
+            const recButton = document.getElementById('generate-recommendation-button');
+
+            recText.textContent = '';
+            recContainer.classList.add('hidden');
+            recLoading.classList.remove('hidden');
+            recButton.disabled = true;
+
+            const cartSummary = cart.map(item => `${item.name} (${item.quantity}x, Kantin ${item.canteen})`).join(', ');
+            const cartTotal = calculateCartTotal().toLocaleString('id-ID');
+
+            const systemPrompt = "Anda adalah asisten AI yang merekomendasikan menu makanan dan minuman pendamping di kantin. Berikan rekomendasi singkat dan menarik (maksimal 2 kalimat) berdasarkan item yang sudah ada di keranjang. Jangan merekomendasikan item yang sudah ada di keranjang (yaitu, jangan merekomendasikan: Nasi Goreng Spesial, Mie Ayam Bakso, Es Teh Manis, Kentang Goreng, Ayam Geprek Sambal Matah, Jus Alpukat, Puding Cokelat, Lemon Tea Dingin). Fokus pada hidangan penutup, minuman segar, atau lauk pendamping. Jawab dalam Bahasa Indonesia.";
+
+            const userQuery = `Item saat ini di keranjang: ${cartSummary}. Total harga: Rp ${cartTotal}. Berikan rekomendasi satu item tambahan yang cocok!`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const result = await fetchWithRetry(apiUrl, options);
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, kami kesulitan menemukan rekomendasi saat ini.";
+
+                recText.textContent = text;
+                recContainer.classList.remove('hidden');
+                
+            } catch (error) {
+                recText.textContent = "Terjadi kesalahan saat memuat rekomendasi AI. Silakan coba lagi.";
+                recContainer.classList.remove('hidden');
+                console.error("Gemini API Error:", error);
+            } finally {
+                recLoading.classList.add('hidden');
+                recButton.disabled = false;
+            }
+        }
+
+
+        // --- INISIALISASI ---
+        function initializeApp() {
+            loadUsers();
+            loadCart();
+
+            // Cek apakah ada user yang sedang login
+            const storedUser = localStorage.getItem('kantinCurrentUser');
+            if (storedUser) {
+                try {
+                    currentUser = JSON.parse(storedUser);
+                    renderMenuPage();
+                } catch (e) {
+                    console.error("Error parsing currentUser from localStorage:", e);
+                    renderLoginPage();
+                }
+            } else {
+                renderLoginPage();
+            }
+
+            // Tambahkan event listener global
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            document.getElementById('cart-button').addEventListener('click', showCartModal);
+            document.getElementById('checkout-button').addEventListener('click', handleCheckout);
+            // Binding untuk fitur Gemini
+            document.getElementById('generate-recommendation-button').addEventListener('click', generateRecommendation);
+        }
+
+        // Jalankan aplikasi setelah DOM dimuat
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+    </script>
+</body>
+</html>
